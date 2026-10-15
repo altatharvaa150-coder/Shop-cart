@@ -6,7 +6,8 @@ export const isAuthenticated = async (req,res,next) =>{
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' })
         }
-        const decoded = jwt.verify(token, process.env.jwt_secret)
+        const secret = process.env.jwt_secret || process.env.JWT_SECRET;
+        const decoded = jwt.verify(token, secret)
         req.user = await Customer.findById(decoded.userId)
         next()
     } catch (error) {

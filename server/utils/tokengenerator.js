@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 const gentoken=(userId)=>{
-    return jwt.sign({userId},process.env.jwt_secret,{expiresIn:'10d'})
+    const secret = process.env.jwt_secret || process.env.JWT_SECRET;
+    return jwt.sign({userId}, secret, {expiresIn:'10d'})
 }
 export default gentoken

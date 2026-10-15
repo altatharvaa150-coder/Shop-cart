@@ -52,7 +52,15 @@ app.get("/health", (req, res) => {
     });
 });
 
-mongoose.connect(process.env.dburi).then(() => console.log("connected to mongo biatch")).catch(err => console.log(err))
+const mongoUri = process.env.dburi || process.env.MONGO_URI || process.env.MONGODB_URI || process.env.DB_URI;
+
+if (!mongoUri) {
+    console.error("❌ CRITICAL: MongoDB connection string is missing! Please configure 'dburi' or 'MONGO_URI' in your Render environment variables.");
+} else {
+    mongoose.connect(mongoUri)
+        .then(() => console.log("Connected to MongoDB successfully"))
+        .catch(err => console.error("MongoDB connection error:", err));
+}
 
 app.listen(port, "0.0.0.0", () => {
     console.log(`Server started at port ${port}`)
