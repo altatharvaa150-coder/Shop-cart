@@ -1,10 +1,11 @@
 import express from "express";
-import { registerCustomer, loginCustomer, getme, addtowishlist, removefromwishlist, getwishlist, addtocart, getcurrentusercart, updateCartQuantity, removeFromCart } from "../controllers/customer-rej.controllers.js";
+import { registerCustomer, loginCustomer, getme, addtowishlist, removefromwishlist, getwishlist, addtocart, getcurrentusercart, updateCartQuantity, removeFromCart, logoutCustomer } from "../controllers/customer-rej.controllers.js";
 import { isAuthenticated } from "../middleware/middleware.js";
 const router = express.Router()
 
 router.post('/register', registerCustomer)
 router.post('/login', loginCustomer)
+router.post('/logout', logoutCustomer)
 router.get('/me', isAuthenticated, getme)
 router.post('/wishlist/:productId', isAuthenticated, addtowishlist)
 router.get('/wishlist', isAuthenticated, getwishlist)

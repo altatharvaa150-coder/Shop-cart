@@ -2,14 +2,19 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { api } from '../services/api';
 
 function Navbar() {
   const { user, setUser } = useAuth();
   const { totalCount } = useCart();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  const handleLogout = async () => {
+    try {
+      await api.post('/customers/logout');
+    } catch (err) {
+      // Even if API fails, clear local state
+    }
     setUser(null);
     navigate('/login');
   };

@@ -6,9 +6,15 @@ import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 
 
+// ── Production-aware cookie settings ──
+const isProduction = process.env.NODE_ENV === "production";
+
 const cookieOptions = {
-    httpOnly: true
-}
+    httpOnly: true,
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
 
 
 export const registerCustomer = async (req, res) => {
@@ -345,6 +351,16 @@ export const removeFromCart = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server crashed', error: error.message });
     }
+};
+
+// ── Logout (clears httpOnly cookie server-side) ──
+export const logoutCustomer = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction,
+    });
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
 

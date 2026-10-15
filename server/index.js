@@ -15,12 +15,25 @@ dotenv.config({ path: join(__dirname, '.env') })
 
 
 const app = express()
-const port = 8005
+const port = process.env.PORT || 8005
 
-app.use(cors({
-    origin: 'http://localhost:5173',
+// ── Production CORS ──
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.CLIENT_URL
+].filter(Boolean);
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true
-}))
+};
+
+app.use(cors(corsOptions))
 app.use(express.json())//middleware
 app.use(cookieParser())
 app.use('/customers', router)
@@ -31,8 +44,16 @@ app.get('/', (req, res) => {
     res.send("hi its started")
 })
 
+// ── Health check endpoint ──
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        message: "Server is running"
+    });
+});
+
 mongoose.connect(process.env.dburi).then(() => console.log("connected to mongo biatch")).catch(err => console.log(err))
 
-app.listen(port, () => {
-    console.log("Server started at port 8005")
-})
+app.listen(port, "0.0.0.0", () => {
+    console.log(`Server started at port ${port}`)
+})
